@@ -11,7 +11,6 @@ const passportLocalMongoose = require('passport-local-mongoose');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const findOrCreate = require('mongoose-findorcreate');
 const res = require('express/lib/response');
-const { deleteOne } = require('mongoose/lib/model');
 
 
 const app = express();
@@ -35,7 +34,8 @@ mongoose.connect('mongodb://localhost:27017/userDB');
 const userSchema = new mongoose.Schema ({
   username: String,
   password:  String,
-  googleId: String
+  googleId: String,
+  secret: String
 });
 
 userSchema.plugin(passportLocalMongoose);
@@ -54,8 +54,6 @@ passport.use(new GoogleStrategy({
   callbackURL: "http://localhost:3000/auth/google/secrets",  
   },
   function(accessToken, refreshToken, profile, email, cb) {
-    //console.log(JSON.stringify(profile));
-    //console.log(JSON.stringify(email));
     User.findOne({username: email.emails[0].value}, function (err, user) {
       if(err){
         return cb(err);
@@ -92,11 +90,15 @@ app.get('/auth/google/secrets',
 );
 
 app.get('/secrets', function(req, res){
-  if(req.isAuthenticated()){
-    res.render('secrets');
-  } else {
-    res.redirect('/login');
-  }
+  User.find({'secret': {$ne: null}}, function(err, foundUsers){
+    if(err){
+      console.log(err);
+    } else {
+      if (foundUsers){
+        res.render('secrets', {userWithSecrets: foundUsers});
+      }
+    }
+  })
 });
 
 app.get('/logout', function(req, res){
@@ -126,11 +128,27 @@ app.route('/register')
 
 app.route('/submit')
   .get(function(req, res){
-    res.render('submit');
+    if(req.isAuthenticated()){
+      res.render('submit');
+    } else {
+      res.redirect('/login');
+    }
   })
-  /* .post(function(req, res){
-
-  }) */
+  .post(function(req, res){
+    submittedSecret = req.body.secret;
+    User.findById(req.user.id, function(err, user){
+      if (err){
+        console.log(err);
+      } else {
+        if (user){
+          user.secret = submittedSecret;
+          user.save(function(){
+            res.redirect('/secrets');
+          });
+        }
+      }
+    });
+  });
 
 app.route('/login')
   .get(function(req, res){
