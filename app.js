@@ -54,7 +54,7 @@ passport.use(new GoogleStrategy({
   callbackURL: "http://localhost:3000/auth/google/secrets",  
   },
   function(accessToken, refreshToken, profile, email, cb) {
-    User.findOne({username: email.emails[0].value}, function (err, user) {
+    User.findOne({username: email.emails[0].value}, function (err, user) { 
       if(err){
         return cb(err);
       }
