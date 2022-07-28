@@ -30,18 +30,6 @@ app.get('/', function(req, res){
   res.render('home');
 });
 
-// app.get('/secrets', function(req, res){
-//   User.find({'secret': {$ne: null}}, function(err, foundUsers){
-//     if(err){
-//       console.log(err);
-//     } else {
-//       if (foundUsers){
-//         res.render('secrets', {userWithSecrets: foundUsers});
-//       }
-//     }
-//   })
-// });
-
 app.listen(port, function(){
   console.log(`Running on ${port}`);
 })

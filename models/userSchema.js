@@ -5,11 +5,9 @@ const userSchema = new Schema (
   username: String,
   email: String,
   password:  String,
-  socialMediaId: [
-    {googleId: String},
-    {facebookID: String},
-    {twitterId: String}
-  ],  
+  googleId: String,
+  facebookID: String,
+  twitterId: String,  
   web3Account: [String],
   tokenPosition: [{contractId: String}]
 });

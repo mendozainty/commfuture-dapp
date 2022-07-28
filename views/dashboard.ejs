@@ -1,0 +1,37 @@
+<%- include('partials/header') %>
+
+<div class="jumbotron text-center">
+  <div class="container">
+    
+    <h4 class="display-3">Dashboard</h4>
+    
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">User</th>
+          <th scope="col">email</th>
+          <th scope="col">Web3 Account</th>
+          <th scope="col">Token Position</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">1</th>
+          <td><%= userDashboard.username %></td>
+          <td><%= userDashboard.email %></td>
+          <td><%= userDashboard.web3Account[0] %></td>
+          <td><%= userDashboard.tokenPosition[0] %></td>
+        </tr>        
+      </tbody>
+    </table>
+
+        
+    <hr>
+    
+    <a class="btn btn-light btn-lg" href="/logout" role="button">Log Out</a>
+    <a class="btn btn-dark btn-lg" href="/submit" role="button">Submit a transaction</a>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

@@ -7,18 +7,29 @@ const Contract = db.model('Contract');
 
 router.use(bodyParser.urlencoded({extended:true}));
 
-router.get('/dashboard', (req, res) => {
-  if(req.isAuthenticated()){
-    res.render('dashboard/' + req.user.id)
-  } else {
-    res.redirect('/login')
-  }
+router.get('/', (req, res) => {  
+  User.findById(req.user.id, (err, user) => {
+    if (err) { console.log(err);}
+    else {
+      if (user) {        
+        res.render('dashboard', { userDashboard: user})
+      }
+    }
+  })      
 })
 
-router.get('/dashboard/:user', (req, res) => {
-  var user = req.params.user;
+// router.get('/secrets', (req, res) => {
+//   if(req.isAuthenticated()){
+//     res.render('secrets')
+//   } else {
+//     res.redirect('/login')
+//   }
+// })
 
-})
+// router.get('/dashboard/:user', (req, res) => {
+//   var user = req.params.user;
+
+// })
 
 
 // router.get('/submit', function(req, res){
