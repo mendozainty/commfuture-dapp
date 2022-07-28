@@ -1,5 +1,4 @@
 const { Schema } = require('mongoose')
-const contractSchema = require('../models/contractSchema')
 
 const userSchema = new Schema (
   {
@@ -12,7 +11,7 @@ const userSchema = new Schema (
     {twitterId: String}
   ],  
   web3Account: [String],
-  contracts: contractSchema
+  tokenPosition: [{contractId: string}]
 });
 
 module.exports = userSchema;

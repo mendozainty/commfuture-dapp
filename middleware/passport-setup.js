@@ -1,5 +1,6 @@
 require('dotenv').config({ path: '../.env'})
 const passport = require('passport');
+const LocalStrategy = require('passport-local')
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const db = require('../middleware/db');
 const User = db.model('User');
@@ -10,7 +11,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser((id, done) => {
   User.findById(id).then((user) => {
-      done(null, user);
+    done(null, user);
   });
 });
 
@@ -41,3 +42,9 @@ passport.use(
     }); 
   }
 ));
+
+passport.use(
+  new LocalStrategy((username, password) => {
+
+  })
+)

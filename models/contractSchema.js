@@ -1,6 +1,5 @@
 const { Schema } = require('mongoose')
 
-
 const contractSchema = new Schema ({
   contractAddress: String,
   tokenID: Number,
