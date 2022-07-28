@@ -4,6 +4,8 @@ const LocalStrategy = require('passport-local')
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const db = require('../middleware/db');
 const User = db.model('User');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -20,7 +22,7 @@ passport.use(
   new GoogleStrategy({
   clientID: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
-  callbackURL: "/auth/google/redirect",  
+  callbackURL: "http://localhost:3000/auth/google/redirect",  
   }, (accessToken, refreshToken, profile, done) => {
     User.findOne({socialMediaId: [{googleId: profile.id}]}).then((currentUser) => {
       if(currentUser){
@@ -44,7 +46,32 @@ passport.use(
 ));
 
 passport.use(
-  new LocalStrategy((username, password) => {
-
+  new LocalStrategy(({user}, done) => {
+    User.findOne({username: user.username}).then((currentUser) => {
+      if(currentUser){
+        console.log(currentUser);
+        bcrypt.hash(user.password, saltRounds).then((hash) => {
+          bcrypt.compare(hash, currentUser.password).then((result) => {
+            return result;
+          }).catch((err) => {
+            console.log(err);
+          })
+        }).then((currentUser) => {
+          done(null, currentUser)
+        })
+      } else {
+        bcrypt.hash(user.password, saltRounds).then((hash) =>{
+          new User({
+            username: user.username,
+            email: user.email,
+            password: hash
+          }).save().then((newUser) => {
+            console.log(newUser);
+            //done(null, newUser)
+          })
+        })
+        
+      }
+    })
   })
 )

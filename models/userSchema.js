@@ -11,7 +11,7 @@ const userSchema = new Schema (
     {twitterId: String}
   ],  
   web3Account: [String],
-  tokenPosition: [{contractId: string}]
+  tokenPosition: [{contractId: String}]
 });
 
 module.exports = userSchema;

@@ -1,8 +1,11 @@
 const router = require('express').Router();
 const passport = require('passport');
-const dashboardRoutes = require('../routes/dashboard')
+const bodyParser = require('body-parser');
+const dashboardRoutes = require('../routes/dashboard');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
-router.use("/dashboard", dashboardRoutes)
+router.use("/dashboard", dashboardRoutes);
+router.use(bodyParser.urlencoded({extended:true}));
 
 router.get('/login', (req, res, next) => {
   res.render('login');
@@ -11,6 +14,7 @@ router.get('/login', (req, res, next) => {
 router.post('/login', function(req, res){ 
   const user = new User ({
     username: req.body.username,
+    email: req.body.email,
     password: req.body.password
   });
 
@@ -26,8 +30,11 @@ router.post('/login', function(req, res){
 });
 
 router.get('/logout', (req, res) => {
-  // handle with passport
-  res.send('logging out');
+  req.logout(function(err){
+    if(!err){
+      res.redirect('/');
+    }
+  });  
 });
 
 router.get('/google', passport.authenticate('google', {
@@ -36,8 +43,7 @@ router.get('/google', passport.authenticate('google', {
 
 router.get('/google/redirect', 
 passport.authenticate('google', {failureRedirect: '/login'}), (req, res) => {
-  let user = encodeURIComponent(req.user.id)
-  res.redirect(`/dashboard/${user}`)
+  res.redirect(`/dashboard/`)
   console.log(req.user);   
 })
 
@@ -46,7 +52,7 @@ router.get('/register', function(req, res){
   })  
   
 router.post('/register', function(req, res){             
-  User.register({username: req.body.username}, req.body.password, function(err, user){
+  User.register({username: req.body.username}, req.body.email, req.body.password, function(err, user){
     if(err){
       console.log(err);
       res.redirect('/register');
