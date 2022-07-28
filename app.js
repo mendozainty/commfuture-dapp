@@ -1,16 +1,10 @@
 //jshint esversion:6
 require('dotenv').config();
-
 const express = require('express');
 const ejs = require('ejs');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
 const session = require('express-session');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const res = require('express/lib/response');
-const client = require('./middleware/db')
-const User = require('./middleware/db')
+const authRoutes = require('./routes/auth')
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -29,46 +23,12 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-
-passport.use(User.createStrategy());
-
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
-
-passport.use(new GoogleStrategy({
-  clientID: process.env.CLIENT_ID,
-  clientSecret: process.env.CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/google/secrets",  
-  },
-  function(accessToken, refreshToken, profile, email, cb) {
-    User.findOne({username: email.emails[0].value}, function (err, user) { 
-      if(err){
-        return cb(err);
-      }
-      if(!user){
-        const newUser = new User ({
-          username: email.emails[0].value,
-          socialMediaId: email.id
-        });
-        newUser.save(function(err){
-          if(err) console.log(err);
-          return cb(err, user);           
-        });
-      } else {
-        return cb(err, user);
-      }; 
-    }); 
-  }
-));
-
+app.use('/auth', authRoutes);
 
 app.get('/', function(req, res){
   res.render('home');
 });
 
-app.get('/auth/google',
-  passport.authenticate('google', { scope: ['profile', 'email']})
-);
 
 app.get('/auth/google/secrets',
   passport.authenticate('google', {failureRedirect: '/login'}),
