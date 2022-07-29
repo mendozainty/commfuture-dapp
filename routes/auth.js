@@ -9,7 +9,6 @@ const db = require('../middleware/db');
 const User = db.model('User');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const ejs = require('ejs');
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
