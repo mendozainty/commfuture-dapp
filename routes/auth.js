@@ -1,28 +1,25 @@
 require('dotenv').config({ path: '../.env'})
 const router = require('express').Router();
-const passport = require('passport');
 const bodyParser = require('body-parser');
 const dashboardRoutes = require('../routes/dashboard');
-const LocalStrategy = require('passport-local')
+
+router.use("/dashboard", dashboardRoutes);
+router.use(bodyParser.urlencoded({extended:true}));
+
+const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const db = require('../middleware/db');
-const User = db.model('User');
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const { User } = require('../middleware/db');
+passport.use(User.createStrategy());
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
-
 passport.deserializeUser((id, done) => {
   User.findById(id).then((user) => {
     done(null, user);
   });
 });
 
-
-router.use("/dashboard", dashboardRoutes);
-router.use(bodyParser.urlencoded({extended:true}));
 
 
 router.get('/login', (req, res, next) => {
@@ -31,17 +28,15 @@ router.get('/login', (req, res, next) => {
 
 router.post('/login', function(req, res){ 
   const user = new User ({
-    username: req.body.username,
-    email: req.body.email,
+    username: req.body.username,    
     password: req.body.password
   });
-
   req.login(user, function(err){
     if(err){
       console.log(err);
     } else {
-      passport.authenticate('local')(req, res, () => {
-      res.redirect('/auth/dashboard/secrets');
+      passport.authenticate('local') (req, res, () => {
+        res.redirect('/auth/dashboard');
       })
     }
   })
@@ -68,18 +63,19 @@ router.get('/register', function(req, res){
   res.render('register');  
   })  
 
-router.post('/register', function(req, res){             
-  User.register({username: req.body.username}, req.body.email, req.body.password, function(err, user){
-    if(err){
+router.post('/register', (req, res) => {
+  User.register({username: req.body.username, email: req.body.email}, req.body.password, (err, user) => {
+    if (err) {
       console.log(err);
       res.redirect('/register');
     } else {
-      passport.authenticate('local')(req, res, function(){
-      res.redirect('/auth/dashboard');
+        passport.authenticate('local') (req, res, () => {        
+        res.redirect('/auth/dashboard');        
       })
     }
-  }) 
-});
+  })
+}
+);
 
 passport.use(
   new GoogleStrategy({
@@ -104,36 +100,5 @@ passport.use(
     }); 
   }
 ));
-
-passport.use(
-  new LocalStrategy(({user}, done) => {
-    User.findOne({username: user.username}).then((currentUser) => {
-      if(currentUser){
-          bcrypt.hash(user.password, saltRounds).then((hash) => {
-          bcrypt.compare(hash, currentUser.password).then((result) => {
-            return result;
-          }).catch((err) => {
-            console.log(err);
-          })
-        }).then((currentUser) => {
-          done(null, currentUser)
-        })
-      } else {
-        bcrypt.hash(user.password, saltRounds).then((hash) =>{
-          new User({
-            username: user.username,
-            email: user.email,
-            password: hash
-          }).save().then((newUser) => {
-            console.log(newUser);
-            //done(null, newUser)
-          })
-        })
-        
-      }
-    })
-  })
-)
-
 
 module.exports = router;

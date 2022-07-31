@@ -1,21 +1,14 @@
 const router = require('express').Router();
-const db = require('../middleware/db');
-const bodyParser = require('body-parser');
-const User = db.model('User');
-const Contract = db.model('Contract');
+const { User, Contract } = require('../middleware/db');
 
-
-router.use(bodyParser.urlencoded({extended:true}));
-
-router.get('/', (req, res) => {  
-  User.findById(req.user.id, (err, user) => {
-    if (err) { console.log(err);}
-    else {
-      if (user) {        
-        res.render('dashboard', { userDashboard: user})
-      }
-    }
-  })      
+router.get('/', (req, res) => {
+  const user = req.user 
+  if(req.isAuthenticated()){   
+    res.render('dashboard', { userDashboard: user })   
+    console.log(user);       
+  } else {
+    res.redirect('/auth/login')
+  }
 })
 
 // router.get('/secrets', (req, res) => {
