@@ -28,18 +28,26 @@
     <hr>
     
     <a class="btn btn-light btn-lg" href="/auth/logout" role="button">Log Out</a>
-    <%  let connect = false; %>
-    <%  function includeConnect() { %>
-    <%    connect = true; %>
-    <%  } %>
-    <%  if (connect) { %>
-    <%- include('partials/metamask/connectWallet'); %>
-    <%  } %>
-    <a id="enableEthereumButton" class="btn btn-dark btn-lg"  role="button" onclick="includeConnect()">Connect Wallet</a>
+    
+    
+    <a id="enableEthereumButton" class="btn btn-dark btn-lg"  role="button" onclick="getAccount()">Connect Wallet</a>
   </div>
 </div>
 
-
+<script>
+  function getAccount() { 
+    window.ethereum.request({method: 'eth_accounts'})
+    .then((result) => {
+      console.log(result);
+      result = currentAccount;
+    // $.post('/auth/dashboard/web3account', {web3Account: currentAccount}, (result))
+    // return result;
+    })
+    .catch((err) => {
+      $('#web3account').text(e.message);
+    })        
+  }      
+</script>
 
 <%- include('partials/footer') %>
 

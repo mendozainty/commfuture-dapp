@@ -14,7 +14,7 @@ router.get('/:userid', (req, res) => {
   res.render('dashboard', { userDashboard: user })
 })
 
-router.post('/:userid/web3account', (req, res) => {
+router.post('/web3account', (req, res) => {
   let currentAccount = req.body.web3Account;
   User.updateOne({id: req.user.id}, {web3Account: currentAccount})
   .then((user) => {
