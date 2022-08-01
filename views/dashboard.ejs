@@ -18,7 +18,7 @@
         <tr>          
           <td><%= userDashboard.username %></td>
           <td><%= userDashboard.email %></td>
-          <td><%= userDashboard.web3Account[0] %></td>
+          <td id="web3account"><%= userDashboard.web3Account[0] %></td>
           <td><%= userDashboard.tokenPosition[0] %></td>
         </tr>        
       </tbody>
@@ -28,8 +28,18 @@
     <hr>
     
     <a class="btn btn-light btn-lg" href="/auth/logout" role="button">Log Out</a>
-    <a class="btn btn-dark btn-lg" href="/submit" role="button">Submit a transaction</a>
+    <%  let connect = false; %>
+    <%  function includeConnect() { %>
+    <%    connect = true; %>
+    <%  } %>
+    <%  if (connect) { %>
+    <%- include('partials/metamask/connectWallet'); %>
+    <%  } %>
+    <a id="enableEthereumButton" class="btn btn-dark btn-lg"  role="button" onclick="includeConnect()">Connect Wallet</a>
   </div>
 </div>
 
+
+
 <%- include('partials/footer') %>
+

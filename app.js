@@ -11,9 +11,6 @@ const app = express();
 app.disable('x-powered-by')
 const port = process.env.PORT || 3000;
 
-
-// app.use((req, res, next) => {res.status(404).send("Sorry can't find this page!")})
-// app.use((err, req, res, next) => {console.error(err.stack);res.status(500).send('Something went wrong...')})
 app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'ejs');
 

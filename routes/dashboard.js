@@ -1,37 +1,26 @@
 const router = require('express').Router();
 const { User, Contract } = require('../middleware/db');
 
-router.get('/', (req, res) => {
-  const user = req.user 
+router.get('/', (req, res) => {  
   if(req.isAuthenticated()){   
-    res.render('dashboard', { userDashboard: user })   
-    console.log(user);       
+    res.redirect('dashboard/'+ req.user.id) 
   } else {
     res.redirect('/auth/login')
   }
 })
 
-// router.get('/secrets', (req, res) => {
-//   if(req.isAuthenticated()){
-//     res.render('secrets')
-//   } else {
-//     res.redirect('/login')
-//   }
-// })
+router.get('/:userid', (req, res) => {
+  const user = req.user;
+  res.render('dashboard', { userDashboard: user })
+})
 
-// router.get('/dashboard/:user', (req, res) => {
-//   var user = req.params.user;
-
-// })
-
-
-// router.get('/submit', function(req, res){
-//     if(req.isAuthenticated()){
-//       res.render('submit');
-//     } else {
-//       res.redirect('/login');
-//     }
-//   })
+router.post('/:userid/web3account', (req, res) => {
+  let currentAccount = req.body.web3Account;
+  User.updateOne({id: req.user.id}, {web3Account: currentAccount})
+  .then((user) => {
+    console.log(user);
+  })
+})
 
 // router.post('/submit', function(req, res){
 //     submittedSecret = req.body.secret;
