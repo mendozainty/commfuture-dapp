@@ -1,14 +1,18 @@
 require('dotenv').config({ path: '../.env'})
+const express = require('express');
 const router = require('express').Router();
 const bodyParser = require('body-parser');
 const dashboardRoutes = require('../routes/dashboard');
-
-router.use("/dashboard", dashboardRoutes);
-router.use(bodyParser.urlencoded({extended:true}));
-
+const ipfsRoutes = require('../routes/ipfshash')
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const { User } = require('../middleware/db');
+
+router.use(bodyParser.urlencoded({extended:true}));
+router.use(express.static(__dirname + './public'));
+router.use("/dashboard", dashboardRoutes);
+router.use("/ipfshash", ipfsRoutes);
+
 passport.use(User.createStrategy());
 
 passport.serializeUser((user, done) => {
@@ -19,8 +23,6 @@ passport.deserializeUser((id, done) => {
     done(null, user);
   });
 });
-
-
 
 router.get('/login', (req, res, next) => {
   res.render('login');
@@ -76,6 +78,10 @@ router.post('/register', (req, res) => {
   })
 }
 );
+
+router.post('/ipfs/hash', (req, res) => {
+  console.log(req.body.uploadfile);
+})
 
 passport.use(
   new GoogleStrategy({

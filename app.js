@@ -5,7 +5,7 @@ const ejs = require('ejs');
 const passport = require('passport');
 const session = require('express-session');
 const authRoutes = require('./routes/auth');
-const dashboardRoutes = require('./routes/dashboard')
+const dashboardRoutes = require('./routes/dashboard');
 
 const app = express();
 app.disable('x-powered-by')
@@ -33,3 +33,5 @@ app.get('/', function(req, res){
 app.listen(port, function(){
   console.log(`Running on ${port}`);
 })
+
+

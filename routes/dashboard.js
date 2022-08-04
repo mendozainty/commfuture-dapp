@@ -1,5 +1,8 @@
+const express = require('express')
 const router = require('express').Router();
 const { User, Contract } = require('../middleware/db');
+
+router.use(express.static(__dirname + './public'));
 
 router.get('/', (req, res) => {  
   if(req.isAuthenticated()){   
@@ -14,13 +17,13 @@ router.get('/:userid', (req, res) => {
   res.render('dashboard', { userDashboard: user })
 })
 
-router.post('/:userid/web3account', (req, res) => {
-  let currentAccount = req.body.web3Account;
-  User.updateOne({id: req.user.id}, {web3Account: currentAccount})
-  .then((user) => {
-    console.log(user);
-  })
-})
+// router.post('/auth/dashboard/web3account', (req, res) => {
+//   let currentAccount = req.body.web3Account;
+//   User.updateOne({id: req.user.id}, {web3Account: currentAccount})
+//   .then((user) => {
+//     console.log(user);
+//   })
+// })
 
 // router.post('/submit', function(req, res){
 //     submittedSecret = req.body.secret;

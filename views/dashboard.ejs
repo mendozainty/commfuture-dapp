@@ -22,24 +22,55 @@
           <td><%= userDashboard.tokenPosition[0] %></td>
         </tr>        
       </tbody>
-    </table>
-
-        
-    <hr>
-    
-    <a class="btn btn-light btn-lg" href="/auth/logout" role="button">Log Out</a>
-    <%  let connect = false; %>
-    <%  function includeConnect() { %>
-    <%    connect = true; %>
-    <%  } %>
-    <%  if (connect) { %>
-    <%- include('partials/metamask/connectWallet'); %>
-    <%  } %>
-    <a id="enableEthereumButton" class="btn btn-dark btn-lg"  role="button" onclick="includeConnect()">Connect Wallet</a>
+    </table>   
+    <hr>    
+    <a class="btn btn-light btn-lg" href="/auth/logout" role="button">Log Out</a>    
+    <a class="btn btn-dark btn-lg"  role="button" onclick="connect()">Connect Wallet</a>
+  </div>
+  <hr>
+  <div>
+    <form action="/auth/ipfshash" method="POST" enctype="multipart/form-data">            
+      <div class="form-group">
+        <label for="uploadfile">Upload File</label>
+        <input type="file" class="form-control" name="uploadfile">
+      </div>      
+      <button type="submit" class="btn btn-dark">Upload File</button>
+    </form>
   </div>
 </div>
 
-
+<script>
+  const getAccount =  async () => {
+    try {
+      let result;
+      const currentAccount = await ethereum.request({
+        method: 'eth_accounts'
+    })
+    result = currentAccount;
+    // $('#account').text(result);
+    console.log(result);
+    return result;
+    } catch (e) {
+      // $('#account').text(e.message);
+    }
+    return currentAccount;
+    // $.post('/auth/dashboard/web3account', {web3account: currentAccount}, (req, res), () => {
+    //   console.log('post');
+    // })   
+  }
+  
+const connect =  async () => { 
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      await getAccount();
+         
+    // if (window.ethereum) {
+    //   const [ ethConnet, ethAccount] = await Promise.all([ connect(), getAccount() ]);            
+    // } else {
+    //   console.log('no metamask');
+    // }
+  }
+  
+</script>
 
 <%- include('partials/footer') %>
 
