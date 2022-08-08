@@ -68,7 +68,7 @@ contract CommFutureNFT is Context, ERC165, IERC721, IERC721Metadata {
         return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenUri)) : "";
     }
     function _baseURI() internal view virtual returns (string memory) {
-        return "/ipfs/";
+        return "https://gateway.pinata.cloud/ipfs/";
     }
     function tokenMetadata(uint256 tokenId) internal view virtual returns (string memory) {
         return _tokenUri[tokenId];
