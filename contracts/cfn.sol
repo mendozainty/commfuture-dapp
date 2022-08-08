@@ -18,6 +18,7 @@ contract CommFutureNFT is Context, ERC165, IERC721, IERC721Metadata {
 
     string private _name = "CommFutureNFT";
     string private _symbol = "CFN";
+    string private _domain;
     address public contractOwner;
     
     mapping(uint256 => address) private _owners;   
@@ -63,13 +64,17 @@ contract CommFutureNFT is Context, ERC165, IERC721, IERC721Metadata {
     }
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
-        string memory baseURI = _baseURI();
+        string memory baseURI = _baseURI();        
         string memory tokenUri = tokenMetadata(tokenId);
-        return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenUri)) : "";
+        return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, _domain, tokenUri)) : "";
+
     }
     function _baseURI() internal view virtual returns (string memory) {
-        return "https://gateway.pinata.cloud/ipfs/";
+        return "https://";
     }
+    function _setDomain(string memory domain) public onlyContractOwner {
+        _domain = domain;        
+    }    
     function tokenMetadata(uint256 tokenId) internal view virtual returns (string memory) {
         return _tokenUri[tokenId];
     }
