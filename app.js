@@ -6,7 +6,6 @@ const passport = require('passport');
 const session = require('express-session');
 const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
-
 const app = express();
 app.disable('x-powered-by')
 const port = process.env.PORT || 3000;

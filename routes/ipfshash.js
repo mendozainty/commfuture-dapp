@@ -1,12 +1,12 @@
 require('dotenv').config({ path: '../.env'});
 const router = require('express').Router();
 const bodyParser = require('body-parser');
-const fs = require('fs');
 const multer = require('multer');
 const upload = multer({dest: 'uploads/'});
-// var axios = require('axios');
-var FormData = require('form-data');
-// const formidable = require('formidable');
+const pinataSDK = require('@pinata/sdk');
+const pinata = pinataSDK(process.env.PINATA_API_KEY, process.env.PINATA_API_SECRET);
+const fs = require('fs');
+const { User, Contract } = require('../middleware/db');
 
 
 router.use(bodyParser.urlencoded({extended:true}));
@@ -15,27 +15,36 @@ router.use(bodyParser.urlencoded({extended:true}));
 
 router.post('/', upload.single('uploadfile'), (req, res, next) =>  {
   
-  const { headers, file } = req;
-  const { buffer, originalname, path, mimetype, size , filename} = file;
-  console.log(file.mimetype);
+  const sourcePath = './uploads/' + req.file.filename
+  console.log(req.file);
+  const options = {
+    pinataMetadata: {
+        name: req.file.originalname,
+        keyvalues: {
+            customKey: 'customValue',
+            customKey2: 'customValue2'
+        }
+    },
+    pinataOptions: {
+        cidVersion: 1
+    }
+  };
   
-  var formFile = new FormData();
-  formFile.append('uploadfile', buffer, { filename: filename, filepath: path, contentType: mimetype, knownLength: size });
+  pinata.pinFromFS(sourcePath, options).then((result) => {
+    //handle results here
+    console.log(result);
+  }).catch((err) => {
+    //handle error here
+    console.log(err);
+  });
   
-  // headers['Content-Type'] = 'multipart/form-data';
-  // headers['Authorization'] = `Bearer ${process.env.PINATA_JWT}`
-  // const url = 'https://api.pinata.cloud/pinning/pinFileToIPFS';
-
-  // doPOST(url, formFile, {}, headers)
-  //   .catch((error) => {
-  //     const { status, data } = error.response;
-  //     res.status(status).send(data);
-  //   })
-  //   .then(({ data }) => {
-  //     res.send(data);
-  //   });
+  
 });
  
 
 
 module.exports = router;
+
+
+
+ 
