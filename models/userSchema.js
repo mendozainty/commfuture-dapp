@@ -7,8 +7,9 @@ const userSchema = new Schema (
   password:  String,
   googleId: String,
   facebookID: String,
-  twitterId: String,  
-  web3Account: String,
+  twitterId: String,
+  connectedAccount: String,  
+  web3Account: [String],
   tokenPosition: [{contractId: String}]
 });
 

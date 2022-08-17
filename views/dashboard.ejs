@@ -1,16 +1,19 @@
 <%- include('partials/header') %>
 
+
+
 <div class="jumbotron text-center">
-  <div class="container">
+  <div class="container-fluid">
     
     <h4 class="display-3">Dashboard</h4>
     
-    <table class="table">
+    <table class="table table-primary table-striped">
       <thead>
         <tr>          
           <th scope="col">User</th>
           <th scope="col">email</th>
-          <th scope="col">Web3 Account</th>
+          <th scope="col">Connected Account</th>
+          <th scope="col">Registered Accounts</th>
           <th scope="col">Token Position</th>
         </tr>
       </thead>
@@ -18,11 +21,20 @@
         <tr>          
           <td><%= userDashboard.username %></td>
           <td><%= userDashboard.email %></td>
-          <td id="web3account"><%= userDashboard.web3Account %></td>
+          <td><%= currentAccount %></td>
+          <td id="web3account">            
+            <ul style="list-style: none;"> 
+              <% userDashboard.web3Account.forEach(function(account) {%>
+                <% if (account!==currentAccount) {%>
+                <li><%= account %> &nbsp <span><a class="btn btn-dark btn-sm" href="/auth/dashboard/remove" role="button">Remove</a></span> </li><hr> 
+                <% }})%>            
+            </ul>
+            </td>
           <td><%= userDashboard.tokenPosition %></td>
         </tr>        
       </tbody>
-    </table>   
+    </table>  
+
     <hr>    
     <a class="btn btn-light btn-lg" href="/auth/logout" role="button">Log Out</a>    
     <a class="btn btn-light btn-lg"  role="button" onclick="connect()">Connect Wallet</a>
@@ -40,35 +52,58 @@
 </div>
 
 <script>
+  
+  /* window.onload =  (event) => {
+    const currentAccount = getAccount()
+    .then((account) => {
+      $.post('/auth/dashboard', { connectedAccount: account })
+      console.log(account);
+      
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  } */
+
+  window.ethereum.on('accountsChanged', async (accounts) => {
+    $.post('/auth/dashboard/connectedAccount', { connectedAccount: accounts[0] }, (response) => {
+      if (response) {
+        location.reload();
+      }
+    })
+    console.log(accounts[0]);;
+  })
+
   const getAccount =  async () => {
-    try {
-      let result;
-      const currentAccount = await ethereum.request({
+    try {      
+      const currentAccount = await window.ethereum.request({
         method: 'eth_accounts'
     })
-    result = currentAccount[0];    
+    result = currentAccount[0];
+    return result;        
+    } catch (e) {console.log(e);
+    }
+  }
+  
+  const findOrCreate = async () => {
     $.post('/auth/dashboard/web3account', {web3account: result}, (response) => {
       if (response) {
         location.reload();
       }
-    })     
-    } catch (e) {
-      console.log(e);
-    }
-    
-      
+    }) 
   }
-  
-const connect =  async () => { 
+
+  const connect =  async () => { 
       await window.ethereum.request({ method: 'eth_requestAccounts' });
       await getAccount();
+      await findOrCreate();
          
     // if (window.ethereum) {
     //   const [ ethConnet, ethAccount] = await Promise.all([ connect(), getAccount() ]);            
     // } else {
     //   console.log('no metamask');
     // }
-  }
+  } 
   
 </script>
 
