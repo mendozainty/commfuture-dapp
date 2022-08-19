@@ -34,24 +34,60 @@ router.post('/connectedAccount', (req, res) => {
 
 router.get('/:userid',  (req, res) => {  
   const user = req.user;
-  res.render('dashboard', { userDashboard: user, currentAccount: connectedAccount })
+  res.render('dashboard', { userDashboard: user })
 })
 
-router.post('/web3account', (req, res) => {  
-  let currentAccount = req.body.web3account; 
-  User.findOne({web3Account: currentAccount}).then((currentUser) => {
-    if(currentUser) {
-      res.redirect('/')
-    } else {
-      User.updateOne({_id: req.user.id}, {$push: {web3Account: currentAccount}})
-        .then((response) => {
-        res.send(response);
+router.post('/web3account', (req, res) => {
+  console.log(req.user.web3Account.length);
+  if(req.user.web3Account.length > 0){
+    for(let i=0; i<= req.user.web3Account.length; i++){
+      if(req.user.web3Account[i] == req.body.connectedAccount){
+        User.updateOne({_id: req.user._id}, {connectedAccount: req.body.connectedAccount})
+        .then((result) => {
+          res.send(result);
+        })
+        .catch((err) => {console.log(err);})
+      } else {
+        User.updateOne({_id: req.user._id}, {connectedAccount: req.body.connectedAccount, $push: {web3Account: req.body.connectedAccount}})
+        .then((result) => {
+          res.send(result)
+        })
+        .catch((err) => {console.log(err);})
+      }
+    }  
+  } else {
+    User.updateOne({_id: req.user._id}, {connectedAccount: req.body.connectedAccount, $push: {web3Account: req.body.connectedAccount}})
+      .then((result) => {
+        res.send(result)
       })
-    }
-  })  
-  .catch((err) => {
-    console.log(err);
-  }) 
+      .catch((err) => {console.log(err);})
+  }
 })
 
 module.exports = router;
+
+/* User.findOne({web3Account: req.body.connectedAccount}).then((currentUser) => {
+  if(currentUser) {
+    console.log(currentUser);
+      currentUser.findOne({web3Account: [req.body.connectedAccount]}).then((result) => {
+      if(!result){
+        currentUser.updateOne({$push: {web3Account: req.body.connectedAccount}})
+      }
+    })
+    .then((response) => {
+      if(response) {
+        res.redirect('/')
+      }})
+    .catch((err) => {
+      console.log(err);
+    })      
+  } else {
+    User.updateOne({_id: req.user._id}, {$push: {web3Account: req.body.connectedAccount}, connectedAccount: req.body.connectedAccount})
+      .then((response) => {
+      res.send(response);
+    })
+  }
+})  
+.catch((err) => {
+  console.log(err);
+})  */

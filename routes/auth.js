@@ -66,7 +66,7 @@ router.get('/register', function(req, res){
   })  
 
 router.post('/register', (req, res) => {
-  User.register({username: req.body.username, email: req.body.email}, req.body.password, (err, user) => {
+  User.register({username: req.body.username, email: req.body.email, connectedAccount: ""}, req.body.password, (err, user) => {
     if (err) {
       console.log(err);
       res.redirect('/register');
@@ -96,7 +96,8 @@ passport.use(
         new User({
           username: profile.displayName,
           email: profile.emails[0].value,
-          googleId: profile.id
+          googleId: profile.id,
+          connectedAccount: ""
           }).save().then((newUser) => {
           done(null, newUser)
         }).catch((err) => {

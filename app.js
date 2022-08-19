@@ -23,7 +23,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/auth', authRoutes);
-app.use('/dasboard', dashboardRoutes);
+app.use('/dashboard', dashboardRoutes);
 
 app.get('/', function(req, res){
   res.render('home');

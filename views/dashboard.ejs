@@ -21,11 +21,11 @@
         <tr>          
           <td><%= userDashboard.username %></td>
           <td><%= userDashboard.email %></td>
-          <td><%= currentAccount %></td>
+          <td><%= userDashboard.connectedAccount %></td>
           <td id="web3account">            
             <ul style="list-style: none;"> 
               <% userDashboard.web3Account.forEach(function(account) {%>
-                <% if (account!==currentAccount) {%>
+                <% if (account!==userDashboard.connectedAccount) {%>
                 <li><%= account %> &nbsp <span><a class="btn btn-dark btn-sm" href="/auth/dashboard/remove" role="button">Remove</a></span> </li><hr> 
                 <% }})%>            
             </ul>
@@ -66,12 +66,11 @@
   } */
 
   window.ethereum.on('accountsChanged', async (accounts) => {
-    $.post('/auth/dashboard/connectedAccount', { connectedAccount: accounts[0] }, (response) => {
+    $.post('/auth/dashboard/web3account', { connectedAccount: accounts[0] }, (response) => {
       if (response) {
         location.reload();
       }
-    })
-    console.log(accounts[0]);;
+    })    
   })
 
   const getAccount =  async () => {
@@ -85,24 +84,30 @@
     }
   }
   
-  const findOrCreate = async () => {
-    $.post('/auth/dashboard/web3account', {web3account: result}, (response) => {
+  const findOrCreate = async (connectedAccount) => {
+    let result = connectedAccount;
+    $.post('/auth/dashboard/web3account', {connectedAccount: result, web3account: result}, (response) => {
       if (response) {
-        location.reload();
+        return response;
       }
     }) 
   }
 
-  const connect =  async () => { 
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-      await getAccount();
-      await findOrCreate();
-         
-    // if (window.ethereum) {
-    //   const [ ethConnet, ethAccount] = await Promise.all([ connect(), getAccount() ]);            
-    // } else {
-    //   console.log('no metamask');
-    // }
+  const connect = () => { 
+      window.ethereum.request({ method: 'eth_requestAccounts' })
+      .then((response) => {
+        console.log(response);
+        let connectedAccount = response[0];
+        findOrCreate(connectedAccount)
+      })
+      .then((result) => {
+        if(result){
+          location.reload();
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   } 
   
 </script>
