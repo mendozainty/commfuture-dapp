@@ -38,10 +38,10 @@ router.get('/:userid',  (req, res) => {
 })
 
 router.post('/web3account', (req, res) => {
-  console.log(req.user.web3Account.length);
+  
   if(req.user.web3Account.length > 0){
     for(let i=0; i<= req.user.web3Account.length; i++){
-      if(req.user.web3Account[i] == req.body.connectedAccount){
+      if(req.user.web3Account[i] === req.body.connectedAccount){
         User.updateOne({_id: req.user._id}, {connectedAccount: req.body.connectedAccount})
         .then((result) => {
           res.send(result);
