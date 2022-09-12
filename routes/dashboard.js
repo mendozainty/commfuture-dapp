@@ -38,6 +38,7 @@ router.get('/:userid',  (req, res) => {
 })
 
 router.post('/web3account', (req, res) => {
+
   
   if(req.user.web3Account.length > 0){
     for(let i=0; i<= req.user.web3Account.length; i++){
@@ -62,32 +63,7 @@ router.post('/web3account', (req, res) => {
       })
       .catch((err) => {console.log(err);})
   }
+
 })
 
 module.exports = router;
-
-/* User.findOne({web3Account: req.body.connectedAccount}).then((currentUser) => {
-  if(currentUser) {
-    console.log(currentUser);
-      currentUser.findOne({web3Account: [req.body.connectedAccount]}).then((result) => {
-      if(!result){
-        currentUser.updateOne({$push: {web3Account: req.body.connectedAccount}})
-      }
-    })
-    .then((response) => {
-      if(response) {
-        res.redirect('/')
-      }})
-    .catch((err) => {
-      console.log(err);
-    })      
-  } else {
-    User.updateOne({_id: req.user._id}, {$push: {web3Account: req.body.connectedAccount}, connectedAccount: req.body.connectedAccount})
-      .then((response) => {
-      res.send(response);
-    })
-  }
-})  
-.catch((err) => {
-  console.log(err);
-})  */
