@@ -1,16 +1,19 @@
 <%- include('partials/header') %>
 
+
+
 <div class="jumbotron text-center">
-  <div class="container">
+  <div class="container-fluid">
     
     <h4 class="display-3">Dashboard</h4>
     
-    <table class="table">
+    <table class="table table-primary table-striped">
       <thead>
         <tr>          
           <th scope="col">User</th>
           <th scope="col">email</th>
-          <th scope="col">Web3 Account</th>
+          <th scope="col">Connected Account</th>
+          <th scope="col">Registered Accounts</th>
           <th scope="col">Token Position</th>
         </tr>
       </thead>
@@ -18,35 +21,96 @@
         <tr>          
           <td><%= userDashboard.username %></td>
           <td><%= userDashboard.email %></td>
-          <td id="web3account"><%= userDashboard.web3Account[0] %></td>
-          <td><%= userDashboard.tokenPosition[0] %></td>
+          <td><%= userDashboard.connectedAccount %></td>
+          <td id="web3account">            
+            <ul style="list-style: none;"> 
+              <% userDashboard.web3Account.forEach(function(account) {%>
+                <% if (account!==userDashboard.connectedAccount) {%>
+                <li><%= account %> &nbsp <span><a class="btn btn-dark btn-sm" href="/auth/dashboard/remove" role="button">Remove</a></span> </li><hr> 
+                <% }})%>            
+            </ul>
+            </td>
+          <td><%= userDashboard.tokenPosition %></td>
         </tr>        
       </tbody>
-    </table>
+    </table>  
 
-        
-    <hr>
-    
-    <a class="btn btn-light btn-lg" href="/auth/logout" role="button">Log Out</a>
-    
-    
-    <a id="enableEthereumButton" class="btn btn-dark btn-lg"  role="button" onclick="getAccount()">Connect Wallet</a>
+
+    <hr>    
+    <a class="btn btn-light btn-lg" href="/auth/logout" role="button">Log Out</a>    
+    <a class="btn btn-light btn-lg"  role="button" onclick="connect()">Connect Wallet</a>
+  </div>
+  <hr>
+  <div>
+    <form action="/auth/ipfshash" method="POST" enctype="multipart/form-data">            
+      <div class="form-group">
+        <label for="uploadfile">Upload File</label>
+        <input type="file" class="form-control" name="uploadfile">
+      </div>      
+      <button type="submit" class="btn btn-dark">Upload File</button>
+    </form>
+
   </div>
 </div>
 
 <script>
-  function getAccount() { 
-    window.ethereum.request({method: 'eth_accounts'})
-    .then((result) => {
-      console.log(result);
-      result = currentAccount;
-    // $.post('/auth/dashboard/web3account', {web3Account: currentAccount}, (result))
-    // return result;
+
+  /* window.onload =  (event) => {
+    const currentAccount = getAccount()
+    .then((account) => {
+      $.post('/auth/dashboard', { connectedAccount: account })
+      console.log(account);
+      
     })
     .catch((err) => {
-      $('#web3account').text(e.message);
-    })        
-  }      
+      console.log(err);
+    });
+  } */
+
+  window.ethereum.on('accountsChanged', async (accounts) => {
+    $.post('/auth/dashboard/web3account', { connectedAccount: accounts[0] }, (response) => {
+      if (response) {
+        location.reload();
+      }
+    })    
+  })
+
+  const getAccount =  async () => {
+    try {      
+      const currentAccount = await window.ethereum.request({
+        method: 'eth_accounts'
+    })
+    result = currentAccount[0];
+    return result;        
+    } catch (e) {console.log(e);
+    }
+  }
+  
+  const findOrCreate = async (connectedAccount) => {
+    let result = connectedAccount;
+    await $.post('/auth/dashboard/web3account', {connectedAccount: result, web3account: result}, (response) => {
+      if (response) {
+        return response;
+      }
+    }) 
+  }
+
+  const connect = () => { 
+      window.ethereum.request({ method: 'eth_requestAccounts' })
+      .then((response) => {        
+        let connectedAccount = response[0];
+        findOrCreate(connectedAccount)
+      })
+      .then((result) => {
+        if(result){
+          location.reload();
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }   
+
 </script>
 
 <%- include('partials/footer') %>
