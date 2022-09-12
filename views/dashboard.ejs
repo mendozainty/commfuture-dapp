@@ -68,7 +68,7 @@
   } */
 
   window.ethereum.on('accountsChanged', async (accounts) => {
-    $.post('/auth/dashboard/web3account', { connectedAccount: accounts[0] }, (response) => {
+    await $.post('/auth/dashboard/web3account', { connectedAccount: accounts[0] }, (response) => {
       if (response) {
         location.reload();
       }

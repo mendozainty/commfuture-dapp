@@ -87,7 +87,7 @@ passport.use(
   new GoogleStrategy({
   clientID: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/google/redirect",  
+  callbackURL: "http://localhost:3001/auth/google/redirect",  
   }, (accessToken, refreshToken, profile, done) => {
     User.findOne({googleId: profile.id}).then((currentUser) => {
       if(currentUser){       
