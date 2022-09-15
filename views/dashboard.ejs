@@ -38,7 +38,7 @@
 
     <hr>    
     <a class="btn btn-light btn-lg" href="/auth/logout" role="button">Log Out</a>    
-    <a class="btn btn-light btn-lg"  role="button" onclick="connect()">Connect Wallet</a>
+    <a id="enableEthereumButton" class="btn btn-light btn-lg"  role="button" >Connect Wallet</a>
   </div>
   <hr>
   <div>
@@ -53,65 +53,6 @@
   </div>
 </div>
 
-<script>
-
-  /* window.onload =  (event) => {
-    const currentAccount = getAccount()
-    .then((account) => {
-      $.post('/auth/dashboard', { connectedAccount: account })
-      console.log(account);
-      
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  } */
-
-  window.ethereum.on('accountsChanged', async (accounts) => {
-    await $.post('/auth/dashboard/web3account', { connectedAccount: accounts[0] }, (response) => {
-      if (response) {
-        location.reload();
-      }
-    })    
-  })
-
-  const getAccount =  async () => {
-    try {      
-      const currentAccount = await window.ethereum.request({
-        method: 'eth_accounts'
-    })
-    result = currentAccount[0];
-    return result;        
-    } catch (e) {console.log(e);
-    }
-  }
-  
-  const findOrCreate = async (connectedAccount) => {
-    let result = connectedAccount;
-    await $.post('/auth/dashboard/web3account', {connectedAccount: result, web3account: result}, (response) => {
-      if (response) {
-        return response;
-      }
-    }) 
-  }
-
-  const connect = () => { 
-      window.ethereum.request({ method: 'eth_requestAccounts' })
-      .then((response) => {        
-        let connectedAccount = response[0];
-        findOrCreate(connectedAccount)
-      })
-      .then((result) => {
-        if(result){
-          location.reload();
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }   
-
-</script>
 
 <%- include('partials/footer') %>
 

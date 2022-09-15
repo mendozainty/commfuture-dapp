@@ -37,13 +37,14 @@ router.get('/:userid',  (req, res) => {
   res.render('dashboard', { userDashboard: user })
 })
 
-router.post('/web3account', (req, res) => {  
+router.post('/web3account', (req, res) => {
+  
   if(req.user.web3Account.length > 0){
     for(let i=0; i<= req.user.web3Account.length; i++){
       if(req.user.web3Account[i] === req.body.connectedAccount){
         User.updateOne({_id: req.user._id}, {connectedAccount: req.body.connectedAccount})
-        .then((result) => {
-          res.send(result);
+        .then((result) => {          
+          res.send(JSON.stringify(result));
         })
         .catch((err) => {console.log(err);})
       } 
@@ -51,7 +52,8 @@ router.post('/web3account', (req, res) => {
   } else {
     User.updateOne({_id: req.user._id}, {connectedAccount: req.body.connectedAccount, $push: {web3Account: req.body.connectedAccount}})
       .then((result) => {
-        res.send(result)
+        console.log(JSON.stringify(result));
+        res.send(JSON.stringify(result));
       })
       .catch((err) => {console.log(err);})
   }

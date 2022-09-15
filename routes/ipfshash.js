@@ -15,8 +15,7 @@ router.use(bodyParser.urlencoded({extended:true}));
 
 router.post('/', upload.single('uploadfile'), (req, res, next) =>  {
   
-  const sourcePath = './uploads/' + req.file.filename
-  console.log(req.file);
+  const sourcePath = './uploads/' + req.file.filename;  
   const options = {
     pinataMetadata: {
         name: req.file.originalname,

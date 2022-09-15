@@ -1,8 +1,59 @@
 $(window).on('load', function() {
   $('#enableEthereumButton').on('click', () => {  
-    ethereum.request({ method: 'eth_requestAccounts' });
-  })
+    let result;
+    let cb;
+    ethereum.request({ method: 'eth_requestAccounts' })
+    .then((accounts) => {
+      result = accounts[0];      
+    })
+    .then(findOrCreate((result, cb)))
+    .then(()=>{
+      console.log(cb);
+      if(cb === true) {
+        window.location.reload(true);
+      } else {
+        console.log('unable to update db');
+      }
+    })     
+  })   
+ 
+    
   
+
+  const findOrCreate = async (connectedAccount, cb) => {
+    let result = connectedAccount;
+    await $.post('/auth/dashboard/web3account', {connectedAccount: result, web3account: result}, (response) => {
+      let accountSaved = JSON.parse(response)
+      if (accountSaved.acknowledged === true) {        
+        cb = true;
+      } else {
+        cb = false;
+      }
+    }) 
+    console.log(cb);
+    return cb;
+  }
+
+  ethereum.on('accountsChanged', async (accounts) => {
+    
+    // await $.post('/auth/dashboard/web3account', { connectedAccount: accounts[0] }, (response) => {
+    //   if (response) {
+    //     location.reload();
+    //   }
+    // })    
+  })
+
+  // const getAccount =  async () => {
+  //   try {      
+  //     const currentAccount = await window.ethereum.request({
+  //       method: 'eth_accounts'
+  //   })
+  //   result = currentAccount[0];
+  //   return result;        
+  //   } catch (e) {console.log(e);
+  //   }
+  // }
+
   const getAccount =  async () => {
     try {
       let result;
